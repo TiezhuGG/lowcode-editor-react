@@ -2,13 +2,16 @@ import { useDrag } from "react-dnd";
 
 export interface MaterialItemProps {
   name: string;
+  desc: string;
 }
 
 export function MaterialItem(props: MaterialItemProps) {
-  const { name } = props;
+  const { name, desc } = props;
 
   const [_, drag] = useDrag({
+    // type 是当前 drag 的元素的标识，drop 的时候根据这个来决定是否 accept
     type: name,
+    // item 是传递的数据
     item: {
       type: name,
     },
@@ -29,7 +32,7 @@ export function MaterialItem(props: MaterialItemProps) {
         hover:bg-[#ccc]
     "
     >
-      {name}
+      {desc}
     </div>
   );
 }
