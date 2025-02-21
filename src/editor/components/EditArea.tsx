@@ -52,6 +52,7 @@ export function EditArea() {
           key: component.id,
           id: component.id,
           name: component.name,
+          styles: component.styles,
           ...config.defaultProps,
           ...component.props,
         },

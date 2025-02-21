@@ -32,7 +32,9 @@ function SelectedMask({
   }, [componentId]);
 
   useEffect(() => {
-    updatePosition();
+    setTimeout(() => {
+      updatePosition();
+    }, 200);
   }, [components]);
 
   useEffect(() => {
@@ -60,7 +62,7 @@ function SelectedMask({
       container.getBoundingClientRect();
 
     let labelTop = top - containerTop + container.scrollTop;
-    let labelLeft = left - containerLeft + width;
+    const labelLeft = left - containerLeft + width;
 
     if (labelTop <= 0) {
       labelTop -= -20;
