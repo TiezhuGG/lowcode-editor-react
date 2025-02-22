@@ -1,20 +1,8 @@
-import MonacoEditor, { OnMount, EditorProps } from "@monaco-editor/react";
-import { editor } from "monaco-editor";
+import MonacoEditor, { OnMount } from "@monaco-editor/react";
+import { useComponentsStore } from "../../stores/components";
 
-export interface EditorFile {
-  name: string;
-  value: string;
-  language: string;
-}
-
-interface Props {
-  value: string;
-  onChange?: EditorProps["onChange"];
-  options?: editor.IStandaloneEditorConstructionOptions;
-}
-
-export default function CssEditor(props: Props) {
-  const { value, onChange, options } = props;
+export function Source() {
+  const { components } = useComponentsStore();
 
   const handleEditorMount: OnMount = (editor, monaco) => {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyJ, () => {
@@ -25,11 +13,10 @@ export default function CssEditor(props: Props) {
   return (
     <MonacoEditor
       height={"100%"}
-      path="component.css"
-      language="css"
+      path="components.json"
+      language="json"
       onMount={handleEditorMount}
-      onChange={onChange}
-      value={value}
+      value={JSON.stringify(components, null, 2)}
       options={{
         fontSize: 14,
         scrollBeyondLastLine: false,
@@ -40,7 +27,6 @@ export default function CssEditor(props: Props) {
           verticalScrollbarSize: 6,
           horizontalScrollbarSize: 6,
         },
-        ...options,
       }}
     />
   );

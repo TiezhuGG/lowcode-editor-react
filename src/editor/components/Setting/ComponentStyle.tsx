@@ -28,7 +28,7 @@ export function ComponentStyle() {
 
   function toCSSStr(css: Record<string, any>) {
     let str = `.comp {\n`;
-    for (let key in css) {
+    for (const key in css) {
       let value = css[key];
       if (!value) {
         continue;
@@ -69,7 +69,7 @@ export function ComponentStyle() {
   const handleEditorChange = debounce((value) => {
     setCss(value);
 
-    let css: Record<string, any> = {};
+    const css: Record<string, any> = {};
 
     try {
       const cssStr = value
@@ -88,7 +88,9 @@ export function ComponentStyle() {
         { ...form.getFieldsValue(), ...css },
         true
       );
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   }, 500);
 
   return (

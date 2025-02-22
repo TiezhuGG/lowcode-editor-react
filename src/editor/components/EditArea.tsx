@@ -42,12 +42,12 @@ export function EditArea() {
     return components.map((component: Component) => {
       const config = componentConfig?.[component.name];
       // console.log("config", config);
-      if (!config?.component) {
+      if (!config?.dev) {
         return null;
       }
 
       return React.createElement(
-        config.component,
+        config.dev,
         {
           key: component.id,
           id: component.id,
