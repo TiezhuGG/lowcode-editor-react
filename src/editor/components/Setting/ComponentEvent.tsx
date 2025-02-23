@@ -4,17 +4,17 @@ import {
   useComponentConfigStore,
 } from "../../stores/component-config";
 import { useComponentsStore } from "../../stores/components";
-import { GoToLinkConfig } from "./actions/GoToLink";
-import { ShowMessageConfig } from "./actions/ShowMessage";
 import { useState } from "react";
-import { ActionModal } from "./ActionModal";
-import { DeleteOutlined } from "@ant-design/icons";
+import { ActionConfig, ActionModal } from "./ActionModal";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 export function ComponentEvent() {
   const { curComponent, updateComponentProps } = useComponentsStore();
   const { componentConfig } = useComponentConfigStore();
   const [actionModalOpen, setActionModalOpen] = useState(false);
   const [curEvent, setCurEvent] = useState<CEvent>();
+  const [curAction, setCurAction] = useState<ActionConfig>();
+  const [curActionIndex, setCurActionIndex] = useState<number>();
 
   if (!curComponent) return null;
 
@@ -58,13 +58,24 @@ export function ComponentEvent() {
       children: (
         <div>
           {(curComponent.props[event.name]?.actions || []).map(
-            (item: GoToLinkConfig | ShowMessageConfig, index: number) => {
+            (item: ActionConfig, index: number) => {
               return (
                 <div key={item.type + String(index)}>
                   {item.type === "goToLink" ? (
                     <div className="border border-[#aaa] m-[10px] p-[10px] relative">
                       <div className="text-[blue]">跳转链接</div>
                       <div>{item.url}</div>
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 10,
+                          right: 30,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => editAction(item, index)}
+                      >
+                        <EditOutlined />
+                      </div>
                       <div
                         style={{
                           position: "absolute",
@@ -87,6 +98,44 @@ export function ComponentEvent() {
                         style={{
                           position: "absolute",
                           top: 10,
+                          right: 30,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => editAction(item, index)}
+                      >
+                        <EditOutlined />
+                      </div>
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 10,
+                          right: 10,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => deleteAction(event, index)}
+                      >
+                        <DeleteOutlined />
+                      </div>
+                    </div>
+                  ) : null}
+                  {item.type === "customJS" ? (
+                    <div className="border border-[#aaa] m-[10px] p-[10px] relative">
+                      <div className="text-[blue]">自定义JS</div>
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 10,
+                          right: 30,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => editAction(item, index)}
+                      >
+                        <EditOutlined />
+                      </div>
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 10,
                           right: 10,
                           cursor: "pointer",
                         }}
@@ -105,20 +154,41 @@ export function ComponentEvent() {
     };
   });
 
-  function handleModalOk(config?: GoToLinkConfig | ShowMessageConfig) {
+  function editAction(config: ActionConfig, index: number) {
+    if (!curComponent) return;
+
+    setCurAction(config);
+    setCurActionIndex(index);
+    setActionModalOpen(true);
+  }
+
+  function handleModalOk(config?: ActionConfig) {
     if (!config || !curEvent || !curComponent) {
       return;
     }
 
-    updateComponentProps(curComponent.id, {
-      [curEvent.name]: {
-        actions: [
-          ...(curComponent.props[curEvent.name]?.actions || []),
-          config,
-        ],
-      },
-    });
+    if (curAction) {
+      updateComponentProps(curComponent.id, {
+        [curEvent.name]: {
+          actions: curComponent.props[curEvent.name]?.actions.map(
+            (item: ActionConfig, index: number) => {
+              return index === curActionIndex ? config : item;
+            }
+          ),
+        },
+      });
+    } else {
+      updateComponentProps(curComponent.id, {
+        [curEvent.name]: {
+          actions: [
+            ...(curComponent.props[curEvent.name]?.actions || []),
+            config,
+          ],
+        },
+      });
+    }
 
+    setCurAction(undefined);
     setActionModalOpen(false);
   }
 
@@ -134,7 +204,9 @@ export function ComponentEvent() {
       <ActionModal
         visible={actionModalOpen}
         handleOk={handleModalOk}
+        action={curAction}
         handleCancel={() => {
+          setCurAction(undefined);
           setActionModalOpen(false);
         }}
       />
