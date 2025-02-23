@@ -1,5 +1,6 @@
 import { CSSProperties } from "react";
-import { create } from "zustand";
+import { create, StateCreator } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface Component {
   id: number;
@@ -31,7 +32,7 @@ interface Action {
   setMode: (mode: State["mode"]) => void;
 }
 
-export const useComponentsStore = create<State & Action>((set, get) => ({
+const creator: StateCreator<State & Action> = (set, get) => ({
   components: [
     {
       id: 1,
@@ -91,8 +92,6 @@ export const useComponentsStore = create<State & Action>((set, get) => ({
       const component = getComponentById(componentId, state.components);
       if (component) {
         component.props = { ...component.props, ...props };
-
-        // return { components: [...state.components] };
       }
 
       return { components: [...state.components] };
@@ -104,13 +103,23 @@ export const useComponentsStore = create<State & Action>((set, get) => ({
         component.styles = replace
           ? styles
           : { ...component.styles, ...styles };
-
-        // return { components: [...state.components] };
       }
 
       return { components: [...state.components] };
     }),
-}));
+});
+
+export const useComponentsStore = create<State & Action>()(
+  persist(creator, {
+    name: "storage-components",
+    partialize: (state) => {
+      const { curComponentId, ...restState } = state;
+      if (curComponentId) {
+        return restState;
+      }
+    },
+  })
+);
 
 export function getComponentById(
   id: number | null,

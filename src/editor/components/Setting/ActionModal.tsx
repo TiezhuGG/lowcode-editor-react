@@ -77,7 +77,7 @@ export function ActionModal(props: ActionModalProps) {
         )}
         {key === "组件方法" && (
           <ComponentMethod
-            key="componentMethod"
+            key="showMessage"
             value={
               action?.type === "componentMethod" ? action.config : undefined
             }

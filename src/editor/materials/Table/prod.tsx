@@ -13,9 +13,8 @@ const Table = ({ url, children }: CommonComponentProps) => {
       setLoading(true);
 
       const { data } = await axios.get(url);
-      console.log("data", data);
-      setData(data);
 
+      setData(data);
       setLoading(false);
     }
   };
